@@ -1,30 +1,42 @@
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
+import "react-native-reanimated"
+import { Tabs } from "expo-router"
+import React from "react"
+import { SQLiteProvider } from "expo-sqlite"
+import Ionicons from "@expo/vector-icons/Ionicons"
+import { initializeDatabase } from "@/db"
+import { Stack } from "expo-router"
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
-  return (
+  // return (
+  //   <SQLiteProvider databaseName="myfirstdb" onInit={initializeDatabase}>
+  //     {/* console.log(`Colors: ${JSON.stringify(colors)}`); */}
+  //     <Tabs>
+  //       <Tabs.Screen
+  //         name="index"
+  //         options={{
+  //           tabBarActiveTintColor: "blue",
+  //           title: "Mathematical Factss",
+  //           tabBarIcon: ({ color, size }) => (
+  //             <Ionicons name="home" color={color} size={size} />
+  //           ),
+  //         }}
+  //       />
+  //       <Tabs.Screen
+  //         name="create_on_db"
+  //         options={{
+  //           title: "Create/Edit Fact",
+  //           tabBarIcon: (props) => (
+  //             <Ionicons name="create" color={props.color} size={props.size} />
+  //           ),
+  //         }}
+  //       />
+  //     </Tabs>
+  //   </SQLiteProvider>
+  // )
+  return(
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: true }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false}} />
+      {/* <Stack.Screen name="" options={{ title: "Mathematical Facts" }} /> */}
     </Stack>
-    // <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-    //   <Stack>
-    //     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    //     <Stack.Screen name="+not-found" />
-    //   </Stack>
-    //   <StatusBar style="auto" />
-    // </ThemeProvider>
-  );
+  )
 }

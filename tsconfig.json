@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "typeRoots": ["./types", "./node_modules/@types"],
       "@/*": [
         "./*"
       ]
@@ -11,7 +12,11 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "logger.ts",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+// , "app/.bak/currMathematicalItem copy 2.tsx", "app/.bak/MathematicalItem copy.tsx"  
+],
+  "exclude": ["fuckoff/*"]
+
 }
