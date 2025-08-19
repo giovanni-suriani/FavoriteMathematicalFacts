@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react"
-import { View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { StyleSheet, Text } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import MathematicalItem from "@/components/MathematicalItem"
 import { FlatList } from "react-native"
+import * as storage from "@/helperStorage"
+import * as helpDB from "@/helperDB"
 import { useSQLiteContext } from "expo-sqlite"
+import Ionicons from "@expo/vector-icons/Ionicons"
 
 // Create with a add+circle blue icon
 // Delete with a remove-circle red icon
@@ -18,41 +21,73 @@ const index = () => {
   // }
 
   // Reading from the database
-  const db = useSQLiteContext();    
+  const db = useSQLiteContext()
 
-  const [items, setItems] = useState<{ id: number, fact: string }[]>([]);
+  const [items, setItems] = useState<{ id: number; fact: string }[]>([])
+
   useEffect(() => {
-    async function setup() {
-      const result: { id: number, fact: string }[] = await db.getAllAsync('SELECT * FROM mathematicalFacts');
-      setItems(result);
-      console.log(`Fetched items: ${JSON.stringify(result)}`);
-    }
-    setup();
-  }, []);
-  
+    async function loadFacts() {
+      try {
+        const dbFacts = await helpDB.getAllFacts(db)
+        const storageFacts = await storage.getAllFacts()
 
-  const scale = 1.7; // Adjust zoom level as needed
+        console.log("Database facts:", dbFacts)
+        console.log("Storage facts:", storageFacts)
+      } catch (err) {
+        console.error("Error loading facts:", err)
+      }
+    }
+
+    loadFacts()
+
+    return () => {
+      // optional cleanup
+    }
+  }, [db])
+
+  const scale = 1.7 // Adjust zoom level as needed
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-      style={{transform: [{ scale: 1 }]}} // Adjust zoom level
+        style={{ transform: [{ scale: 1 }] }} // Adjust zoom level
         data={items}
         // keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={[styles.renderItemView, {marginBottom: 30 * scale}]}>
-            <MathematicalItem latexFact={item.fact} scale={scale}/>
+          <View style={[styles.renderItemView, { marginBottom: 30 * scale }]}>
+            <MathematicalItem latexFact={item.fact} scale={scale} />
             {/* Put a grey trash ionicon here */}
+            <View>
+              <TouchableOpacity>
+                <Ionicons name="trash" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         // removeClippedSubviews={true}
         ListEmptyComponent={
-        <View style={[styles.renderItemView]}>
-          <MathematicalItem latexFact="No facts yet" scale={scale} />
-        </View>
-      }
+            <View style={[styles.renderItemView]}>
+              <MathematicalItem latexFact="No facts yet" scale={scale} />
+            </View>
+        }
       />
       {/* <MathematicalItem latexFact="No facts yet" scale={1.4} /> */}
+      <TouchableOpacity
+        style={styles.deleteAllButton}
+        onPress={async () => {
+          try {
+            await helpDB.deleteAllFacts(db)
+            await storage.clearFacts()
+            setItems([]) // Clear local state
+            alert("All facts deleted successfully!")
+            // console.log("All facts deleted from both database and storage.")
+          } catch (err) {
+            console.error("Error deleting all facts:", err)
+          }
+        }}
+      >
+        <Text style={{ fontSize: 18 }}>Delete All</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   )
 }
@@ -71,9 +106,20 @@ const styles = StyleSheet.create({
     // backgroundColor: "rgb(255, 20, 20)",
     // transform: [{ scale: 4 }], // Adjust zoom level
     // minWidth: "50%",
-    // minHeight: 100, 
+    // minHeight: 100,
     // padding: 10,
     // marginTop: 15,
+  },
+  deleteAllButton: {
+    // minWidth: "100%",
+    fontSize: 24,
+    backgroundColor: "rgb(64, 212, 249)",
+    padding: 15,
+    paddingHorizontal: 25,
+    borderRadius: 15,
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 10,
   },
 })
 
