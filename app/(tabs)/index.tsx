@@ -30,7 +30,7 @@ const index = () => {
       try {
         const dbFacts = await helpDB.getAllFacts(db)
         const storageFacts = await storage.getAllFacts()
-
+        setItems([...(dbFacts || []), ...(storageFacts || [])])
         console.log("Database facts:", dbFacts)
         console.log("Storage facts:", storageFacts)
       } catch (err) {
@@ -52,23 +52,28 @@ const index = () => {
       <FlatList
         style={{ transform: [{ scale: 1 }] }} // Adjust zoom level
         data={items}
-        // keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={[styles.renderItemView, { marginBottom: 30 * scale }]}>
-            <MathematicalItem latexFact={item.fact} scale={scale} />
-            {/* Put a grey trash ionicon here */}
-            <View>
-              <TouchableOpacity>
-                <Ionicons name="trash" size={24} color="red" />
-              </TouchableOpacity>
-            </View>
+          <View style={styles.renderItemView}>
+            <View style={styles.renderItemTwoColumns}>
+              {/* <View> */}
+                <View>
+                  {/* Column 1 */}
+                  <MathematicalItem latexFact={item.fact} scale={scale} />
+                </View>
+                <TouchableOpacity>
+                  {/* Column 2 */}
+                  <Ionicons name="trash" size={24} color="grey" />
+                </TouchableOpacity>
+              </View>
+            {/* </View> */}
           </View>
         )}
         // removeClippedSubviews={true}
         ListEmptyComponent={
-            <View style={[styles.renderItemView]}>
-              <MathematicalItem latexFact="No facts yet" scale={scale} />
-            </View>
+          <View style={[styles.renderItemView]}>
+            <MathematicalItem latexFact="No facts yet" scale={scale} />
+          </View>
         }
       />
       {/* <MathematicalItem latexFact="No facts yet" scale={1.4} /> */}
@@ -100,8 +105,13 @@ const styles = StyleSheet.create({
     // padding: "15%",
   },
   renderItemView: {
+    width: "100%",
     overflow: "visible",
     display: "flex",
+    marginBottom:10,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 50,
     // backgroundColor: "rgba(10, 9, 9, 0.5)",
     // backgroundColor: "rgb(255, 20, 20)",
     // transform: [{ scale: 4 }], // Adjust zoom level
@@ -109,6 +119,15 @@ const styles = StyleSheet.create({
     // minHeight: 100,
     // padding: 10,
     // marginTop: 15,
+  },
+  renderItemTwoColumns:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 18,
+    marginRight: 10,
+    // backgroundColor: "rgba(239, 245, 57, 0.76)",
+    // width: "100%",
   },
   deleteAllButton: {
     // minWidth: "100%",
